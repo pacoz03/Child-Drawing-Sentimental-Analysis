@@ -37,14 +37,24 @@ def base_train():
     #1 primo train tutto a 0.1 e ho ottenuto 8,19 40 epoch
     #2 0.2 0.2 .1 .3 Test Loss: 0.8227, Test Accuracy: 0.6646 50 epoch
     #3 tutto a 0.1 Test Loss: 0.4843, Test Accuracy: 0.9130 70 epoch
+    data_aug = {
+        'rescale': 1./255,
+        'rotation_range': 10,
+        'width_shift_range': 0.1,
+        'height_shift_range': 0.1,
+        'shear_range': 0.1,
+        'zoom_range': 0.1,
+        'horizontal_flip': True
+    }
+
     train_datagen = data_augmentation(
-        rescale=1./255,
-        rotation_range=10,
-        width_shift_range=0.1,
-        height_shift_range=0.1,
-        shear_range=0.1,
-        zoom_range=0.1,
-        horizontal_flip=True,
+        rescale=data_aug['rescale'],
+        rotation_range=data_aug['rotation_range'],
+        width_shift_range=data_aug['width_shift_range'],
+        height_shift_range=data_aug['height_shift_range'],
+        shear_range=data_aug['shear_range'],
+        zoom_range=data_aug['zoom_range'],
+        horizontal_flip=data_aug['horizontal_flip'],
     )
     test_datagen= ImageDataGenerator(rescale=1./255)
 
@@ -122,6 +132,17 @@ def base_train():
 
     test_loss, test_acc = model.evaluate(test_generator)
     print(f"Test Loss: {test_loss:.4f}, Test Accuracy: {test_acc:.4f}")
+
+    metrics.log_metrics(
+        log_file='training_log.csv',
+        model_name='VGG16_with_aug',
+        epochs=epochs,
+        train_acc=max(history.history['accuracy']),
+        test_acc=test_acc,
+        train_loss=min(history.history['loss']),
+        test_loss=test_loss,
+        data_augmentation_params=data_aug
+    )
 
 
 def train_with_vgg():
@@ -208,4 +229,5 @@ def train_with_vgg():
 
 #Esegui
 if __name__ == '__main__':
+    print("GPU Available: ", tf.config.list_physical_devices('GPU'))
     train_with_vgg()

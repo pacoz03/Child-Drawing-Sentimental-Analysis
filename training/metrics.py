@@ -1,11 +1,19 @@
 import csv
 import matplotlib.pyplot as plt
+import os
 
-
-def log_metrics(log_file, model_name, epochs, train_acc, test_acc, train_loss, test_loss):
+def log_metrics(log_file, model_name, epochs, train_acc, test_acc, train_loss, test_loss, data_augmentation_params):
     # Salvataggio delle metriche in un file CSV
-    header = ['Model', 'Epochs', 'Train Accuracy', 'Test Accuracy', 'Train Loss', 'Test Loss']
-    data = [model_name, epochs, train_acc, test_acc, train_loss, test_loss]
+    header = ['Model', 'Epochs', 'Train Accuracy', 'Test Accuracy', 'Train Loss', 'Test Loss', 'Data Augmentation']
+    data = [
+        model_name,
+        epochs,
+        train_acc,
+        test_acc,
+        train_loss,
+        test_loss,
+        str(data_augmentation_params)  # Salva i parametri come stringa
+    ]
 
     # Se il file non esiste, crea l'intestazione
     if not os.path.exists(log_file):
@@ -45,17 +53,3 @@ def plot_metrics(log_file):
     plt.show()
 
 
-# Inserire nel training
-test_loss, test_acc = model.evaluate(test_generator)
-
-log_metrics(
-    log_file='training_log.csv',
-    model_name='VGG16_with_aug',
-    epochs=epochs,
-    train_acc=max(history.history['accuracy']),
-    test_acc=test_acc,
-    train_loss=min(history.history['loss']),
-    test_loss=test_loss
-)
-
-plot_metrics('training_log.csv')
